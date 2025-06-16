@@ -17,27 +17,27 @@ import { usePathname } from 'next/navigation'
 
 const items = [
     {
-        title: "Home",
+        title: "Workspace",
         url: "#",
         icon: Home,
     },
     {
-        title: "Inbox",
+        title: "AI Tools",
         url: "#",
         icon: Inbox,
     },
     {
-        title: "Calendar",
+        title: "My History",
         url: "#",
         icon: Calendar,
     },
     {
-        title: "Search",
+        title: "Billing",
         url: "#",
         icon: Search,
     },
     {
-        title: "Settings",
+        title: "Profile",
         url: "#",
         icon: Settings,
     },
@@ -49,9 +49,9 @@ export function AppSidebar() {
         <Sidebar>
             <SidebarHeader>
                 <div className='p-4'>
-                    <Image src={'/logo.jpg'} alt='logo' width={100} height={50}
+                    <Image src={'/logo.png'} alt='logo' width={100} height={50}
                         className='w-full' />
-                    <h2 className='text-sm text-gray-400 text-center'>Build Awesome</h2>
+                    <h2 className='text-sm text-gray-400 text-center'>Shape your future</h2>
                 </div>
             </SidebarHeader>
             <SidebarContent>
@@ -75,7 +75,7 @@ export function AppSidebar() {
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
-                <h2 className='p-2 text-gray-400 text-sm'>Copyright @Tubeguruji</h2>
+            
             </SidebarFooter>
         </Sidebar>
     )
