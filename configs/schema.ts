@@ -5,10 +5,12 @@ export const usersTable = pgTable("users", {
   email: varchar({ length: 255 }).notNull().unique(),
 });
 
-export const HistoryTable = pgTable('historyTable',{
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
-    recordId: varchar().notNull(),
-    content: json(),
-    userEmail: varchar('userEmail').references(()=>usersTable.email),
-    createdAt: varchar()
-})
+export const HistoryTable = pgTable("historyTable", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  recordId: varchar().notNull(),
+  content: json(),
+  userEmail: varchar("userEmail").references(() => usersTable.email),
+  createdAt: varchar(),
+  aiAgentType: varchar(),
+  metaData: varchar(),
+});

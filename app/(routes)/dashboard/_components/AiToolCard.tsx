@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import ResumeUploadDialog from "./ResumeUploadDialog";
 export interface TOOL {
   name: string;
   desc: string;
@@ -23,10 +24,16 @@ function AiToolCard({ tool }: AiToolProps) {
   const id = uuidv4();
   const { user } = useUser();
   const router = useRouter();
+  const [openResumeUpload, setOpenResumeUpload] = useState(false);
   const onClickButton = async () => {
+    if (tool.name === "AI Resume Analyzer") {
+      setOpenResumeUpload(true);
+      return;
+    }
     const result = await axios.post("/api/history", {
       recordId: id,
       content: [],
+      aiAgentType: tool.path,
     });
     console.log(result);
     router.push(tool.path + "/" + id);
@@ -43,6 +50,10 @@ function AiToolCard({ tool }: AiToolProps) {
       >
         {tool.button}
       </Button>
+      <ResumeUploadDialog
+        openResumeUpload={openResumeUpload}
+        setOpenResumeUpload={setOpenResumeUpload}
+      />
     </div>
   );
 }
