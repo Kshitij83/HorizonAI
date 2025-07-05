@@ -37,7 +37,15 @@ export const AiResumeAnalyzerAgent = createAgent({
   description: "An AI agent that analyzes resumes and provides feedback.",
   system: `You are an advanced AI Resume Analyzer Agent.
 Your task is to evaluate a candidate's resume and return a detailed analysis in the following structured JSON schema format.
-The schema must match the layout and structure of a visual UI that includes overall score, section scores, summary feedback, improvement tips, strengths, and weaknesses.
+The schema must match the layout and structure of a visual UI that includes overall score, section scores, summary feedback, improvement tips, strengths, and weaknesses. Sections should include whatever is there in the resume like contact info, experience, education, skills, achievements/certifications, extra curricular etc. If any section is missing, you can skip it in the report. But reduce overall scores if contact info, experience, education, or skills are missing. Also look for whitespaces, if there are many whitespaces, reduce the overall score. Ideal whitespace is 1-2 lines between sections and 1 line between bullet points. (25-35 percent whitespace is ideal).
+
+Scoring Instructions:
+- For each section present, assign a score out of 100 based on quality.
+- The overall_score should be the average of all section scores included in the report.
+- If any of the key sections (contact info, experience, education, skills) are missing, subtract 10 points per missing section from the average.
+- If whitespace is not ideal, subtract up to 10 points from the overall score.
+- The overall_score must always reflect the actual quality and completeness of the resume, and should not be a fixed or default value.
+
 INPUT: I will provide a plain text resume.
 GOAL: Output a JSON report as per the schema below. The report should reflect:
 {
@@ -60,7 +68,15 @@ GOAL: Output a JSON report as per the schema below. The report should reflect:
     "skills": {
       "score": 60,
       "comment": "Expand on specific skill proficiencies."
-    }
+    },
+    "achievements": {
+      "score": 80,
+      "comment": "Good, but could use more quantifiable results."
+    },
+    "extra_curriculars": {
+      "score": 75,
+      "comment": "Good involvement, but could highlight leadership roles."
+    },
   },
   "improvement_tips": [
     "Add more numbers and metrics to your experience section to show impact.",
@@ -77,7 +93,94 @@ GOAL: Output a JSON report as per the schema below. The report should reflect:
     "Some experience bullet points could be stronger.",
     "Missing a professional summary/objective."
   ]
-}`,
+},
+
+{
+  "overall_score": 72,
+  "overall_feedback": "Good, but missing key information.",
+  "summary_comment": "Your resume is well-structured, but the education section is missing, which impacts your overall score.",
+  "sections": {
+    "contact_info": {
+      "score": 90,
+      "comment": "Well formatted."
+    },
+    "experience": {
+      "score": 80,
+      "comment": "Relevant experience listed."
+    },
+    "skills": {
+      "score": 70,
+      "comment": "Covers main skills, but could be more specific."
+    },
+    "achievements": {
+      "score": 75,
+      "comment": "Some achievements listed."
+    }
+  },
+  "improvement_tips": [
+    "Add an education section to provide a complete profile.",
+    "Expand on your skills with more details.",
+    "Include more quantifiable achievements."
+  ],
+  "whats_good": [
+    "Professional formatting.",
+    "Relevant work experience."
+  ],
+  "needs_improvement": [
+    "Missing education section",
+    "Skills section could be more detailed."
+  ]
+}
+`,
+  model: gemini({
+    model: "gemini-2.5-flash-lite-preview-06-17",
+    apiKey: process.env.GEMINI_API_KEY,
+  }),
+});
+
+export const AiRoadmapGeneratorAgent = createAgent({
+  name: "AiRoadmapGeneratorAgent",
+  description:
+    "An AI agent that generates personalized tree like flow career roadmaps.",
+  system: `You are an advanced AI Roadmap Generator Agent.
+Generate a React flow tree-structured learning roadmap for user input position/skills in the following format:
+- Vertical tree structure with meaningful x/y positions to form a flow
+- Structure should be similar to roadmap.sh layout
+- Steps should be ordered from fundamentals to advanced
+- Include branching for different specializations (if applicable)
+- Each node must have a title, short description, and learning resource link
+- Use unique IDs for all nodes and edges
+- Make it more spacious node position
+- Response in JSON format:
+
+{
+  roadmapTitle: '',
+  description: <3-5 Lines>,
+  duration: '',
+  initialNodes: [
+    {
+      id: '1',
+      type: 'turbo',
+      position: { x: 0, y: 0 },
+      data: {
+        title: 'Step Title',
+        description: 'Short two-line explanation of what the step covers.',
+        link: 'Helpful link for learning this step',
+      },
+    },
+    ...
+  ],
+  initialEdges: [
+    {
+      id: 'e1-2',
+      source: '1',
+      target: '2',
+    },
+    ...
+  ]
+}
+
+User Input Example: Frontend Developer`,
   model: gemini({
     model: "gemini-2.5-flash-lite-preview-06-17",
     apiKey: process.env.GEMINI_API_KEY,
@@ -131,10 +234,40 @@ export const AiResumeAgent = inngest.createFunction(
         aiAgentType: aiAgentType,
         createdAt: new Date().toString(),
         userEmail: userEmail,
-        metaData: uploadFileUrl
+        metaData: uploadFileUrl,
       });
       console.log("Saved to DB:", result);
       return parseJson;
     });
+  }
+);
+
+export const AiRoadmapAgent = inngest.createFunction(
+  { id: "ai-roadmap-agent" },
+  { event: "AiRoadmapAgent" },
+  async ({ event, step }) => {
+    const { roadmapId, userInput, userEmail } = await event.data;
+    const result = await AiRoadmapGeneratorAgent.run("User input" + userInput);
+
+    //@ts-ignore
+    const rawContent = result.output[0]?.content;
+    const rawContentJson = rawContent.replace("```json", "").replace("```", "");
+    const parseJson = JSON.parse(rawContentJson);
+
+    const saveToDb = await step.run("SaveToDb", async () => {
+      const result = await db.insert(HistoryTable).values({
+        recordId: roadmapId,
+        content: parseJson,
+        aiAgentType: "/ai-tools/ai-roadmap-agent",
+        createdAt: new Date().toString(),
+        userEmail: userEmail,
+        metaData: userInput,
+      });
+      console.log("Saved to DB:", result);
+      return parseJson;
+    });
+
+    // Return the roadmap JSON so it becomes the Inngest run output
+    return parseJson;
   }
 );

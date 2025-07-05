@@ -8,6 +8,7 @@ import axios from "axios";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import ResumeUploadDialog from "./ResumeUploadDialog";
+import RoadmapGeneratorDialog from "./RoadmapGeneratorDialog";
 export interface TOOL {
   name: string;
   desc: string;
@@ -25,9 +26,14 @@ function AiToolCard({ tool }: AiToolProps) {
   const { user } = useUser();
   const router = useRouter();
   const [openResumeUpload, setOpenResumeUpload] = useState(false);
+  const [openRoadmapDialog, setOpenRoadmapDialog] = useState(false);
   const onClickButton = async () => {
     if (tool.name === "AI Resume Analyzer") {
       setOpenResumeUpload(true);
+      return;
+    }
+    if (tool.path === "/ai-tools/ai-roadmap-agent") {
+      setOpenRoadmapDialog(true);
       return;
     }
     const result = await axios.post("/api/history", {
@@ -53,6 +59,10 @@ function AiToolCard({ tool }: AiToolProps) {
       <ResumeUploadDialog
         openResumeUpload={openResumeUpload}
         setOpenResumeUpload={setOpenResumeUpload}
+      />
+      <RoadmapGeneratorDialog
+        openDialog={openRoadmapDialog}
+        setOpenDialog={setOpenRoadmapDialog}
       />
     </div>
   );

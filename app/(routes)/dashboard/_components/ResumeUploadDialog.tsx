@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -14,15 +14,13 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-function ResumeUploadDialog({ openResumeUpload, setOpenResumeUpload }: any) {
+function ResumeUploadDialog({ openResumeUpload, setOpenResumeDialog }: any) {
   const [file, setFile] = useState<any>();
-  const [loading,setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const onFileChange = (event: any) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Handle the file upload logic here
-      console.log("File selected:", file.name);
       setFile(file);
     }
   };
@@ -33,30 +31,28 @@ function ResumeUploadDialog({ openResumeUpload, setOpenResumeUpload }: any) {
     const formData = new FormData();
     formData.append("recordId", recordId);
     formData.append("resumeFile", file);
-    // formData.append("aiAgentType", "/ai-tools/ai-resume-analyzer");
     const result = await axios.post("/api/ai-resume-agent", formData);
-    console.log("Resume analysis result:", result.data);
     setLoading(false);
     router.push("/ai-tools/ai-resume-analyzer/" + recordId);
-    setOpenResumeUpload(false);
+    setOpenResumeDialog(false);
   };
 
   return (
-    <Dialog open={openResumeUpload} onOpenChange={setOpenResumeUpload}>
+    <Dialog open={openResumeUpload} onOpenChange={setOpenResumeDialog}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Upload resume pdf file</DialogTitle>
-          <DialogDescription>
-            <div>
+          <DialogDescription asChild>
+            <>
               <label
                 htmlFor="resumeUpload"
                 className="flex items-center flex-col justify-center p-7 border border-dashed rounded-xl hover:bg-slate-200 cursor-pointer"
               >
                 <File className="h-10 w-10" />
                 {file ? (
-                  <h2 className="mt-3 text-blue-600">{file?.name}</h2>
+                  <span className="mt-3 text-blue-600">{file?.name}</span>
                 ) : (
-                  <h2 className="mt-3">Click here to upload resume</h2>
+                  <span className="mt-3">Click here to upload resume</span>
                 )}
               </label>
               <input
@@ -66,13 +62,14 @@ function ResumeUploadDialog({ openResumeUpload, setOpenResumeUpload }: any) {
                 className="hidden"
                 onChange={onFileChange}
               />
-            </div>
+            </>
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant={"outline"}>Cancel</Button>
+          <Button variant={"outline"} type="button" onClick={() => setOpenResumeDialog(false)}>
+            Cancel
+          </Button>
           <Button disabled={!file || loading} onClick={onUploadAndAnalyze}>
-            {" "}
             {loading ? <Loader2Icon className="animate-spin" /> : <Sparkles />} Upload & Analyze
           </Button>
         </DialogFooter>
@@ -82,3 +79,4 @@ function ResumeUploadDialog({ openResumeUpload, setOpenResumeUpload }: any) {
 }
 
 export default ResumeUploadDialog;
+

@@ -1,6 +1,6 @@
 import { serve } from "inngest/next";
 import { inngest } from "../../../inngest/client";
-import { AiCareerAgent, AiResumeAgent, helloWorld } from "@/inngest/functions";
+import { AiCareerAgent, AiResumeAgent, AiRoadmapAgent } from "@/inngest/functions";
 
 // Create an API that serves zero functions
 export const { GET, POST, PUT } = serve({
@@ -8,6 +8,7 @@ export const { GET, POST, PUT } = serve({
   functions: [
     /* your functions will be passed here later! */
     AiCareerAgent,
-    AiResumeAgent
+    AiResumeAgent,
+    AiRoadmapAgent
   ],
 });
