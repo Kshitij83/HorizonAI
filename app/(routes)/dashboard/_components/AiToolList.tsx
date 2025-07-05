@@ -1,7 +1,7 @@
 import React from 'react'
 import AiToolCard from './AiToolCard'
 
-const AiToolsList = [
+export const AiToolsList = [
   {
     name: 'AI Career Q&A Chat',
     desc: 'Ask career-related questions',
@@ -33,7 +33,7 @@ const AiToolsList = [
 ]
 
 
-const AiTools = () => {
+function AiToolList(){
   return (
     <div className='mt-7 p-5 bg-white rounded-xl shadow-md'>
       <h2 className='font-bold text-lg'>Available AI Tools</h2>
@@ -47,4 +47,4 @@ const AiTools = () => {
   )
 }
 
-export default AiTools
+export default AiToolList
