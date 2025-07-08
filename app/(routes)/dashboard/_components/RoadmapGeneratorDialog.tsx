@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose, // <-- import DialogClose
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,16 +15,32 @@ import { Loader2Icon, SparkleIcon } from "lucide-react";
 import axios from "axios";
 import { v4 } from "uuid";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 function RoadmapGeneratorDialog({ openDialog, setOpenDialog }: any) {
   const [userInput, setUserInput] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { has } = useAuth();
   const GenerateRoadmap = async () => {
     const roadmapId = v4();
     console.log("Roadmap ID: " + roadmapId);
     setLoading(true);
     try {
+      //@ts-ignore
+      const hasSubscription = await has({ plan: "premium" });
+      console.log("Has subscription: ", hasSubscription);
+    if (!hasSubscription) {
+      const resultHistory = await axios.get("/api/history");
+      const historyList = resultHistory.data;
+      const isPresent = await historyList.find(
+        (item: any) => item?.aiAgentType == "/ai-tools/ai-roadmap-agent"
+      );
+      router.push("billing");
+      if (isPresent) {
+        return null;
+      }
+    }
       const result = await axios.post("/api/ai-roadmap-agent", {
         roadmapId: roadmapId,
         userInput: userInput,
@@ -53,7 +70,9 @@ function RoadmapGeneratorDialog({ openDialog, setOpenDialog }: any) {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant={"outline"}>Cancel</Button>
+            <DialogClose asChild>
+              <Button variant={"outline"}>Cancel</Button>
+            </DialogClose>
             <Button onClick={GenerateRoadmap} disabled={loading || !userInput}>
               {loading ? (
                 <Loader2Icon className="animate-spin" />

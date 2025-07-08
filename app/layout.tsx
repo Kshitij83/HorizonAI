@@ -5,8 +5,8 @@ import {
   ClerkProvider,
 } from '@clerk/nextjs'
 import Provider from "./provider";
+import { ThemeProvider } from "../context/ThemeContext"; // <-- import ThemeProvider
 import ThemeToggleButton from "../components/ThemeToggleButton";
-
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,10 +34,15 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <ThemeToggleButton />
-          <Provider>
-            {children}
-          </Provider>
+          <ThemeProvider>
+            {/* Theme toggle button always visible in top-right */}
+            <div className="fixed top-4 right-4 z-50">
+              <ThemeToggleButton />
+            </div>
+            <Provider>
+              {children}
+            </Provider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

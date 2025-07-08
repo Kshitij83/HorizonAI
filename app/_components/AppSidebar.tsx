@@ -11,30 +11,30 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { Calendar, Home, Inbox, Search, Settings, Bot, History, CreditCard } from "lucide-react"
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
 const items = [
     {
-        title: "Workspace",
+        title: "Dashboard",
         url: "/dashboard",
         icon: Home,
     },
     {
         title: "AI Tools",
         url: "/ai-tools",
-        icon: Inbox,
+        icon: Bot,
     },
     {
         title: "My History",
         url: "/my-history",
-        icon: Calendar,
+        icon: History,
     },
     {
         title: "Billing",
         url: "/billing",
-        icon: Search,
+        icon: CreditCard,
     },
     {
         title: "Profile",
@@ -56,20 +56,28 @@ export function AppSidebar() {
             </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
-
                     <SidebarGroupContent>
                         <SidebarMenu className='mt-5'>
-                            {items.map((item, index) => (
-                                // <SidebarMenuItem key={item.title} className='p-2'>
-                                //     <SidebarMenuButton asChild className=''>
-                                <a href={item.url} key={index} className={`p-2 text-lg flex gap-2 items-center
-                                 hover:bg-gray-100 rounded-lg ${path.includes(item.url) && 'bg-gray-200ß'}`}>
-                                    <item.icon className='h-5 w-5' />
-                                    <span>{item.title}</span>
-                                </a>
-                                //     </SidebarMenuButton>
-                                // </SidebarMenuItem>
-                            ))}
+                            {items.map((item, index) => {
+                                const isActive = path === item.url || path.startsWith(item.url + "/");
+                                return (
+                                    <a
+                                        href={item.url}
+                                        key={index}
+                                        className={`p-2 text-lg flex gap-2 items-center rounded-lg
+                                            ${
+                                              isActive
+                                                ? "bg-gray-100 dark:bg-[#232946] text-blue-700 dark:text-blue-300"
+                                                : ""
+                                            }
+                                            hover:bg-gray-100 dark:hover:bg-[#232946] transition-colors
+                                        `}
+                                    >
+                                        <item.icon className='h-5 w-5' />
+                                        <span>{item.title}</span>
+                                    </a>
+                                );
+                            })}
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>

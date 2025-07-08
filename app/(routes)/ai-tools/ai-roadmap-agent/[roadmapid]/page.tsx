@@ -5,20 +5,31 @@ import { useParams } from "next/navigation";
 import React, { use, useEffect, useState } from "react";
 import RoadmapCanvas from "./_components/RoadmapCanvas";
 import RoadmapGeneratorDialog from "@/app/(routes)/dashboard/_components/RoadmapGeneratorDialog";
+import { Loader2 } from "lucide-react";
 
 function RoadmapGeneratorAgent() {
   const { roadmapid } = useParams();
   console.log("Roadmap ID: " + roadmapid);
   const [roadmapDetails, setRoadmapDetails] = useState<any>();
   const [openRoadmapGeneratorDialog, setOpenRoadmapGeneratorDialog] = useState(false);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     roadmapid && GetRoadmapDetails();
   }, [roadmapid]);
   const GetRoadmapDetails = async () => {
+    setLoading(true);
     const result = await axios.get("/api/history?recordId=" + roadmapid);
     console.log("Result2: " + result.data);
     setRoadmapDetails(result.data?.content);
+    setLoading(false);
   };
+  if (loading) {
+    return (
+      <div className="flex flex-1 min-h-[400px] items-center justify-center">
+        <Loader2 className="animate-spin w-12 h-12 text-blue-600" />
+      </div>
+    );
+  }
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">

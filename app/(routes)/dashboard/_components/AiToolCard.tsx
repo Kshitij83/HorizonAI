@@ -18,7 +18,7 @@ export interface TOOL {
 }
 
 type AiToolProps = {
-  tool: TOOL;
+  tool: TOOL & { disabled?: boolean };
 };
 
 function AiToolCard({ tool }: AiToolProps) {
@@ -28,6 +28,7 @@ function AiToolCard({ tool }: AiToolProps) {
   const [openResumeUpload, setOpenResumeUpload] = useState(false);
   const [openRoadmapDialog, setOpenRoadmapDialog] = useState(false);
   const onClickButton = async () => {
+    if (tool.disabled) return;
     if (tool.name === "AI Resume Analyzer") {
       setOpenResumeUpload(true);
       return;
@@ -46,13 +47,22 @@ function AiToolCard({ tool }: AiToolProps) {
   };
   return (
     <div className="p-3 border rounded-lg ">
-      <Image src={tool.icon} alt={tool.name} width={40} height={40} />
+      <div className="flex justify-center items-center mb-2">
+        <Image
+          src={tool.icon}
+          alt={tool.name}
+          width={100}
+          height={100}
+          className="mx-auto"
+        />
+      </div>
       <h2 className="font-bold mt-2">{tool.name}</h2>
       <p className="text-gray-400">{tool.desc}</p>
       <Button
         variant={"secondary"}
         className="w-full mt-3"
         onClick={onClickButton}
+        disabled={tool.disabled}
       >
         {tool.button}
       </Button>

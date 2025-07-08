@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { LoaderCircle, Send } from "lucide-react";
+import { Loader2, LoaderCircle, Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import EmptyState from "../_components/EmptyState";
 import axios from "axios";
@@ -25,9 +25,11 @@ function AiChat() {
     chatid && GetMessageList();
   }, [chatid]);
   const GetMessageList = async () => {
+    setLoading(true);
     const result = await axios.get("/api/history?recordId=" + chatid);
     console.log(result.data);
     setMessageList(result?.data?.content);
+    setLoading(false);
   };
 
   const onSend = async () => {
@@ -71,6 +73,13 @@ function AiChat() {
     console.log(result);
     router.replace("/ai-tools/ai-chat/" + id);
   };
+  if (loading && messageList.length === 0) {
+    return (
+      <div className="flex flex-1 min-h-[400px] items-center justify-center">
+        <Loader2 className="animate-spin w-12 h-12 text-blue-600" />
+      </div>
+    );
+  }
   return (
     <div className="px-10 md:px-24 lg:px-36 xl:px-48 h-[75vh] overflow-auto">
       <div className="flex items-center justify-between mb-5 gap-8">

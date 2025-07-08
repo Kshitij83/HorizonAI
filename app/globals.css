@@ -41,6 +41,9 @@ body {
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --horizon-light: #f7fafc;
+    --horizon-light-gradient: linear-gradient(135deg, #f7fafc 0%, #e3f0fa 40%, #e0f7fa 100%);
+    --horizon-dark-gradient: linear-gradient(135deg, #23272f 0%, #232946 60%, #2d3142 100%);
   }
 
   .dark {
@@ -76,6 +79,20 @@ body {
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .bg-horizon {
+    background: var(--horizon-light-gradient);
+  }
+  .dark .bg-horizon {
+    background: var(--horizon-dark-gradient);
+  }
+
+  body {
+    background: var(--horizon-light-gradient);
+  }
+  .dark body {
+    background: var(--horizon-dark-gradient);
   }
 }
 
