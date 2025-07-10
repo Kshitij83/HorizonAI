@@ -1,8 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HorizonAI - AI Career Coach Agent
+
+HorizonAI is your personalized AI career coach agent built with Next.js. Get tailored career roadmaps, expert advice, and resume analysis designed just for you.
+
+## Features
+
+- 🤖 **AI Career Chat**: Get personalized career advice and guidance
+- 📄 **Resume Analyzer**: AI-powered resume analysis and improvement suggestions
+- 🗺️ **Career Roadmap Generator**: Build step-by-step career development plans
+- ✉️ **Cover Letter Generator**: Create compelling cover letters (Coming Soon)
+- 🎤 **Mock Interview**: Practice interviews with AI feedback (Coming Soon)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+ 
+- npm/yarn/pnpm/bun
+- Clerk account for authentication
+- Inngest account for background jobs
+- ImageKit account for file storage
+- Google Gemini API key
+
+### Environment Variables
+
+Create a `.env.local` file in the root directory:
+
+```env
+# Clerk
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+
+# Database
+DATABASE_URL=your_database_url
+
+# Inngest
+INNGEST_EVENT_KEY=your_inngest_event_key
+INNGEST_SIGNING_KEY=your_inngest_signing_key
+INNGEST_SERVER_HOST=https://api.inngest.com
+
+# ImageKit
+IMAGEKIT_PUBLIC_KEY=your_imagekit_public_key
+IMAGEKIT_PRIVATE_KEY=your_imagekit_private_key
+IMAGEKIT_ENDPOINT_URL=your_imagekit_endpoint
+
+# AI
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+# or
+bun install
+```
+
+3. Set up your environment variables
+4. Run the development server:
 
 ```bash
 npm run dev
@@ -14,23 +75,61 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Inngest Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The 404 errors you're seeing (`/x/inngest`, `/.netlify/functions/inngest`, etc.) are normal - Inngest tries multiple endpoint discovery paths. Your actual endpoint `/api/inngest` is working correctly (200 status).
 
-## Learn More
+To connect Inngest to your local development:
 
-To learn more about Next.js, take a look at the following resources:
+1. Install Inngest CLI: `npm install -g inngest`
+2. Run Inngest dev server: `npx inngest-cli@latest dev`
+3. Your functions are served at `/api/inngest`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS
+- **Authentication**: Clerk
+- **Database**: PostgreSQL with Drizzle ORM
+- **Background Jobs**: Inngest
+- **AI**: Google Gemini
+- **File Storage**: ImageKit
+- **UI Components**: Radix UI, Lucide Icons
 
-## Deploy on Vercel
+## Project Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+├── app/                    # Next.js app directory
+│   ├── (auth)/            # Authentication pages
+│   ├── (routes)/          # Main application routes
+│   │   ├── dashboard/     # Dashboard and components
+│   │   ├── ai-tools/      # AI tool pages
+│   │   ├── billing/       # Billing page
+│   │   └── profile/       # User profile
+│   ├── api/               # API routes
+│   └── globals.css        # Global styles
+├── components/            # Reusable components
+├── configs/               # Database and app configuration
+├── context/               # React contexts (Theme)
+├── inngest/               # Inngest functions and client
+└── public/                # Static assets
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License.
+
+## Creator
+
+Created by **Kshitij** - The name HorizonAI is inspired by "Kshitij" which means "horizon" in English, representing new possibilities and endless opportunities in your career journey.
+
+[![GitHub](https://img.shields.io/badge/GitHub-Kshitij83-black?style=flat-square&logo=github)](https://github.com/Kshitij83/HorizonAI)
