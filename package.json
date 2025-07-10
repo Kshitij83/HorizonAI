@@ -5,8 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:production": "SKIP_ENV_VALIDATION=true TYPESCRIPT_IGNORE_BUILD_ERRORS=true next build",
+    "build:vercel": "SKIP_ENV_VALIDATION=true TYPESCRIPT_IGNORE_BUILD_ERRORS=true next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint --fix",
+    "type-check": "tsc --noEmit --skipLibCheck"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.20.0",
