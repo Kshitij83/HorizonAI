@@ -40,7 +40,7 @@ function History() {
       )}
       {userHistory?.length == 0 && !loading ? (
         <div className="flex items-center justify-center mt-5 flex-col">
-          <Image src={"/"} alt="bulb" width={50} height={50} />
+          <Image src={"/bulb.png"} alt="bulb" width={50} height={50} />
           <h2>You do not have any history</h2>
           <Button variant="secondary" className="mt-5">
             Explore AI Tools
@@ -48,24 +48,27 @@ function History() {
         </div>
       ) : (
         <div>
-          {userHistory?.map((history: any, index: number) => (
-            <Link
-              href={history?.aiAgentType + "/" + history?.recordId}
-              className="flex justify-between items-center space-y-6 border p-3 rounded-lg my-3"
-              key={index}
-            >
-              <div key={index} className="flex gap-5">
-                <Image
-                  src={GetAgentName(history?.aiAgentType)?.icon}
-                  alt={"image"}
-                  width={20}
-                  height={20}
-                />
-                <h2>{GetAgentName(history?.aiAgentType)?.name}</h2>
-              </div>
-              <h2>{history.createdAt}</h2>
-            </Link>
-          ))}
+          {userHistory?.map((history: any, index: number) => {
+            const agentData = GetAgentName(history?.aiAgentType);
+            return (
+              <Link
+                href={history?.aiAgentType + "/" + history?.recordId}
+                className="flex justify-between items-center space-y-6 border p-3 rounded-lg my-3"
+                key={index}
+              >
+                <div className="flex gap-5">
+                  <Image
+                    src={agentData?.icon || "/default-icon.png"}
+                    alt={"image"}
+                    width={20}
+                    height={20}
+                  />
+                  <h2>{agentData?.name || "Unknown Tool"}</h2>
+                </div>
+                <h2>{history.createdAt}</h2>
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>
