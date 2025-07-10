@@ -61,6 +61,10 @@ export default {
   				ring: 'hsl(var(--sidebar-ring))'
   			}
   		},
+  		backgroundImage: {
+  			'horizon': 'linear-gradient(135deg, #f7fafc 0%, #e3f0fa 40%, #e0f7fa 100%)',
+  			'horizon-dark': 'linear-gradient(135deg, #23272f 0%, #232946 60%, #2d3142 100%)',
+  		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
