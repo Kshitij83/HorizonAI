@@ -47,15 +47,18 @@ export async function GET(req: any) {
         .where(eq(HistoryTable.recordId, recordId));
       return NextResponse.json(result[0]);
     } else {
-      
+      // Add null check for user email
+      if (!user?.primaryEmailAddress?.emailAddress) {
+        return NextResponse.json([], { status: 200 });
+      }
+
       const result = await db
         .select()
         .from(HistoryTable)
-        .where(eq(HistoryTable.userEmail, user?.primaryEmailAddress?.emailAddress))
+        .where(eq(HistoryTable.userEmail, user.primaryEmailAddress.emailAddress))
         .orderBy(desc(HistoryTable.createdAt));
       return NextResponse.json(result);
     }
-    return NextResponse.json({});
   } catch (e) {
     return NextResponse.json(e);
   }
