@@ -4,6 +4,29 @@ import { inngest } from "@/inngest/client";
 import axios from "axios";
 import { currentUser } from "@clerk/nextjs/server";
 
+async function getRuns(runId: String) {
+  try {
+    const url =
+      process.env.INNGEST_SERVER_HOST + "/v1/events/" + runId + "/runs";
+    console.log("Calling getRuns with URL:", url);
+    const result = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${process.env.INNGEST_SIGNING_KEY}`,
+      },
+    });
+    console.log("getRuns result:", result.data);
+    return result.data;
+  } catch (error: any) {
+    console.error("Error in getRuns:", error);
+    return {
+      error:
+        typeof error === "object" && error !== null && "message" in error
+          ? (error as any).message
+          : String(error),
+    };
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const FormData = await req.formData();
@@ -84,28 +107,5 @@ export async function POST(req: NextRequest) {
       },
       { status: 500 }
     );
-  }
-}
-
-export async function getRuns(runId: String) {
-  try {
-    const url =
-      process.env.INNGEST_SERVER_HOST + "/v1/events/" + runId + "/runs";
-    console.log("Calling getRuns with URL:", url);
-    const result = await axios.get(url, {
-      headers: {
-        Authorization: `Bearer ${process.env.INNGEST_SIGNING_KEY}`,
-      },
-    });
-    console.log("getRuns result:", result.data);
-    return result.data;
-  } catch (error: any) {
-    console.error("Error in getRuns:", error);
-    return {
-      error:
-        typeof error === "object" && error !== null && "message" in error
-          ? (error as any).message
-          : String(error),
-    };
   }
 }
