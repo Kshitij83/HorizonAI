@@ -55,7 +55,19 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
-    const output = runStatus.data?.[0].output?.output[0];
+
+    // Fix the output extraction to handle the actual structure
+    const runData = runStatus?.data?.[0];
+    if (!runData || !runData.output) {
+      return NextResponse.json(
+        { error: "No output found in run" },
+        { status: 500 }
+      );
+    }
+
+    // The output is directly in runData.output, not nested in output[0]
+    const output = runData.output;
+
     return NextResponse.json(
       typeof output === "object" && output !== null
         ? output

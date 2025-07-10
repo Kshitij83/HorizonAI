@@ -212,6 +212,41 @@ export const AiResumeAgent = inngest.createFunction(
   async ({ event, step }) => {
     const { recordId, base64ResumeFile, pdfText, aiAgentType, userEmail } =
       await event.data;
+    
+    // Check if PDF text is empty or too short
+    if (!pdfText || pdfText.trim().length < 50) {
+      const errorResponse = {
+        overall_score: 0,
+        overall_feedback: "Unable to analyze - document appears to be empty or unreadable",
+        summary_comment: "The uploaded document could not be processed. Please ensure you upload a valid PDF resume with readable text content.",
+        sections: {},
+        improvement_tips: [
+          "Upload a clear, text-based PDF resume",
+          "Ensure the document is not image-only or corrupted",
+          "Try converting your resume to a standard PDF format"
+        ],
+        whats_good: [],
+        needs_improvement: [
+          "Document could not be read or is empty"
+        ]
+      };
+      
+      const saveToDb = await step.run("SaveToDb", async () => {
+        const result = await db.insert(HistoryTable).values({
+          recordId: recordId,
+          content: errorResponse,
+          aiAgentType: aiAgentType,
+          createdAt: new Date().toString(),
+          userEmail: userEmail,
+          metaData: "Error: Empty or unreadable document",
+        });
+        console.log("Saved error response to DB:", result);
+        return errorResponse;
+      });
+      
+      return errorResponse;
+    }
+
     const uploadFileUrl = await step.run("uploadImage", async () => {
       const imageKitFile = await imagekit.upload({
         file: base64ResumeFile,
@@ -220,12 +255,57 @@ export const AiResumeAgent = inngest.createFunction(
       });
       return imageKitFile.url;
     });
+    
     const aiResumeReport = await AiResumeAnalyzerAgent.run(pdfText);
     //@ts-ignore
     const rawContent = aiResumeReport.output[0]?.content;
-    const rawContentJson = rawContent.replace("```json", "").replace("```", "");
-    const parseJson = JSON.parse(rawContentJson);
-    //return parseJson;
+    
+    let parseJson;
+    try {
+      // Clean the raw content by removing markdown code blocks
+      const rawContentJson = rawContent.replace(/```json\s*/g, "").replace(/```\s*/g, "");
+      
+      // Check if the content looks like JSON (starts with { and ends with })
+      const trimmedContent = rawContentJson.trim();
+      if (!trimmedContent.startsWith('{') || !trimmedContent.endsWith('}')) {
+        throw new Error('Response is not in JSON format');
+      }
+      
+      parseJson = JSON.parse(rawContentJson);
+      
+      // Validate that the parsed JSON has required fields
+      if (!parseJson.overall_score && parseJson.overall_score !== 0) {
+        throw new Error('Invalid JSON structure - missing overall_score');
+      }
+      
+    } catch (parseError) {
+      console.error("Error parsing AI response:", parseError);
+      console.error("Raw content:", rawContent);
+      
+      // Create a fallback response when JSON parsing fails
+      parseJson = {
+        overall_score: 50,
+        overall_feedback: "Analysis completed but response format error occurred",
+        summary_comment: "The resume was processed but there was an issue formatting the detailed analysis. Please try uploading again or contact support if the issue persists.",
+        sections: {
+          general: {
+            score: 50,
+            comment: "Resume was processed but detailed analysis could not be generated due to a formatting error."
+          }
+        },
+        improvement_tips: [
+          "Try uploading the resume again",
+          "Ensure the PDF is text-based and not an image",
+          "Contact support if the issue continues"
+        ],
+        whats_good: [
+          "Resume was successfully uploaded and processed"
+        ],
+        needs_improvement: [
+          "Detailed analysis could not be completed due to processing error"
+        ]
+      };
+    }
 
     const saveToDb = await step.run("SaveToDb", async () => {
       const result = await db.insert(HistoryTable).values({
@@ -239,6 +319,8 @@ export const AiResumeAgent = inngest.createFunction(
       console.log("Saved to DB:", result);
       return parseJson;
     });
+    
+    return parseJson;
   }
 );
 
